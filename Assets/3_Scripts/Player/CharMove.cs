@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using Mirror;
 
-public class CharMove : NetworkBehaviour
+public class CharMove : MonoBehaviour
 {
     public float walkSpeed = 4.0f;			// Default walking speed.
     public float sprintFactor = 2.0f;       // How much sprinting affects fly speed.
@@ -59,12 +59,8 @@ public class CharMove : NetworkBehaviour
 		Gizmos.DrawWireSphere(groundCheck.position, groundDist);
 	}
 
-	[ClientCallback]
 	void Update()
 	{
-		if (!isOwned)
-			return;
-
 		isGrounded = Physics.CheckSphere(groundCheck.position, groundDist, groundMask);
 
 		if (Cursor.lockState != CursorLockMode.Locked && !isCursorLocked)
@@ -161,7 +157,6 @@ public class CharMove : NetworkBehaviour
 		model.transform.rotation = Quaternion.Slerp(model.transform.rotation, targetRotation, .06f);
 	}
 
-	[ClientCallback]
 	private void AnimatePlayer()
 	{
 		// Check if the character is moving

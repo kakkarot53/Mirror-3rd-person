@@ -46,6 +46,7 @@ public class PlayerSetup : NetworkBehaviour
 
         //setup player move
         localPlayerModel.TryGetComponent<CharMove>(out CharMove _move);
+        _move.enabled = true;
         _move.thirdPersonCam = cameraTransform.gameObject;
 
 
