@@ -7,164 +7,108 @@ public class PlayerAnim : NetworkBehaviour
     [SerializeField] private Animator anim;
     [SerializeField] private CharMove move;
 
+    // Network variables for syncing animation states
+    [SyncVar] private float moveSpeed;
+    [SyncVar] private bool isFalling;
+    [SyncVar] private bool isGrounded;
+    [SyncVar(hook = nameof(OnJumpStartHook))] private bool jumpStartTriggered;
+    [SyncVar(hook = nameof(OnJumpLandHook))] private bool jumpLandTriggered;
+
     private void Start()
     {
-        anim = GetComponent<Animator>();
-        move = GetComponent<CharMove>();
+        if (!isOwned) return;
 
-        if (!isOwned)
-            return;
-
-        move.OnWalk += HandleWalkAnimation;
-        move.OnSprint += HandleSprintAnimation;
-        move.OnIdle += HandleIdleAnimation;
-        move.OnFalling += HandleFallingAnimation;
-        move.OnLanding += HandleLandingAnimation;
-        move.OnJumpStart += HandleJumpStartAnimation;
-        move.OnJumpLand += HandleJumpLandAnimation;
+        move.OnWalk += () => SetMoveSpeed(1f);
+        move.OnSprint += () => SetMoveSpeed(2f);
+        move.OnIdle += () => SetMoveSpeed(0f);
+        move.OnFalling += (falling) => CmdSetFalling(falling);
+        move.OnLanding += (grounded) => CmdSetGrounded(grounded);
+        move.OnJumpStart += () => CmdTriggerJumpStart();
+        move.OnJumpLand += () => CmdTriggerJumpLand();
     }
 
     private void OnDisable()
     {
-        // Unsubscribe from events when the object is disabled
         if (!isOwned) return;
 
-        move.OnWalk -= HandleWalkAnimation;
-        move.OnSprint -= HandleSprintAnimation;
-        move.OnIdle -= HandleIdleAnimation;
-        move.OnFalling -= HandleFallingAnimation;
-        move.OnLanding -= HandleLandingAnimation;
-        move.OnJumpStart -= HandleJumpStartAnimation;
-        move.OnJumpLand -= HandleJumpLandAnimation;
+        move.OnWalk -= () => SetMoveSpeed(1f);
+        move.OnSprint -= () => SetMoveSpeed(2f);
+        move.OnIdle -= () => SetMoveSpeed(0f);
+        move.OnFalling -= (falling) => CmdSetFalling(falling);
+        move.OnLanding -= (grounded) => CmdSetGrounded(grounded);
+        move.OnJumpStart -= () => CmdTriggerJumpStart();
+        move.OnJumpLand -= () => CmdTriggerJumpLand();
     }
 
-    private void HandleWalkAnimation()
+    // Local animation handling
+    private void UpdateAnimations()
     {
-        if (!isOwned) return;
-        //Debug.Log($"walk request caught");
-        CmdSetWalkAnimation();
-    }
-
-    [Command]
-    private void CmdSetWalkAnimation()
-    {
-        RpcSetWalkAnimation();
-    }
-
-    [ClientRpc]
-    private void RpcSetWalkAnimation()
-    {
-        anim.SetFloat("Speed", 1f);
-    }
-
-    private void HandleSprintAnimation()
-    {
-        if (!isOwned) return;
-        //Debug.Log($"sprint request caught");
-        CmdSetSprintAnimation();
-    }
-
-    [Command]
-    private void CmdSetSprintAnimation()
-    {
-        RpcSetSprintAnimation();
-    }
-
-    [ClientRpc]
-    private void RpcSetSprintAnimation()
-    {
-        anim.SetFloat("Speed", 2f);
-    }
-
-    private void HandleIdleAnimation()
-    {
-        if (!isOwned) return;
-        //Debug.Log($"idle request caught");
-        CmdSetIdleAnimation();
-    }
-
-    [Command]
-    private void CmdSetIdleAnimation()
-    {
-        RpcSetIdleAnimation();
-    }
-
-    [ClientRpc]
-    private void RpcSetIdleAnimation()
-    {
-        anim.SetFloat("Speed", 0f);
-    }
-
-    private void HandleFallingAnimation(bool isFalling)
-    {
-        if (!isOwned) return;
-        CmdSetFallingAnimation(isFalling);
-    }
-
-    [Command]
-    private void CmdSetFallingAnimation(bool isFalling)
-    {
-        RpcSetFallingAnimation(isFalling);
-    }
-
-    [ClientRpc]
-    private void RpcSetFallingAnimation(bool isFalling)
-    {
+        anim.SetFloat("Speed", moveSpeed);
         anim.SetBool("FreeFall", isFalling);
+        anim.SetBool("Grounded", isGrounded);
     }
 
-    private void HandleLandingAnimation(bool isLanding)
+    private void SetMoveSpeed(float speed)
     {
         if (!isOwned) return;
-        CmdSetLandingAnimation(isLanding);
+        CmdSetMoveSpeed(speed);
+    }
+
+    // Commands and hooks to sync animation states
+    [Command]
+    private void CmdSetMoveSpeed(float speed)
+    {
+        moveSpeed = speed;
     }
 
     [Command]
-    private void CmdSetLandingAnimation(bool isLanding)
+    private void CmdSetFalling(bool falling)
     {
-        RpcSetLandingAnimation(isLanding);
-    }
-
-    [ClientRpc]
-    private void RpcSetLandingAnimation(bool isLanding)
-    {
-        anim.SetBool("Grounded", isLanding);
-    }
-
-    private void HandleJumpStartAnimation()
-    {
-        if (!isOwned) return;
-        CmdSetJumpStartAnimation();
+        isFalling = falling;
     }
 
     [Command]
-    private void CmdSetJumpStartAnimation()
+    private void CmdSetGrounded(bool grounded)
     {
-        RpcSetJumpStartAnimation();
-    }
-
-    [ClientRpc]
-    private void RpcSetJumpStartAnimation()
-    {
-        anim.SetTrigger("Jump_Start");
-    }
-
-    private void HandleJumpLandAnimation()
-    {
-        if (!isOwned) return;
-        CmdSetJumpLandAnimation();
+        isGrounded = grounded;
     }
 
     [Command]
-    private void CmdSetJumpLandAnimation()
+    private void CmdTriggerJumpStart()
     {
-        RpcSetJumpLandAnimation();
+        jumpStartTriggered = true;
     }
 
-    [ClientRpc]
-    private void RpcSetJumpLandAnimation()
+    private void OnJumpStartHook(bool oldValue, bool newValue)
     {
-        anim.SetTrigger("Jump_Land");
-        anim.ResetTrigger("Jump_Start");
+        if (newValue)
+        {
+            anim.SetTrigger("Jump_Start");
+            jumpStartTriggered = false; // Reset trigger state
+        }
+    }
+
+    [Command]
+    private void CmdTriggerJumpLand()
+    {
+        jumpLandTriggered = true;
+    }
+
+    private void OnJumpLandHook(bool oldValue, bool newValue)
+    {
+        if (newValue)
+        {
+            anim.SetTrigger("Jump_Land");
+            anim.ResetTrigger("Jump_Start");
+            jumpLandTriggered = false; // Reset trigger state
+        }
+    }
+
+    private void Update()
+    {
+        if (!isOwned) return;
+
+        // Update animations locally
+        UpdateAnimations();
     }
 }

@@ -365,7 +365,7 @@ MonoBehaviour:
   interpolatePosition: 1
   interpolateRotation: 1
   interpolateScale: 1
-  coordinateSpace: 0
+  coordinateSpace: 1
   timelineOffset: 1
   showGizmos: 0
   showOverlay: 0
@@ -406,8 +406,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  anim: {fileID: 0}
-  move: {fileID: 0}
+  anim: {fileID: 4159950096693961611}
+  move: {fileID: 3658020750533055086}
 --- !u!1 &5369836183747030084
 GameObject:
   m_ObjectHideFlags: 0
