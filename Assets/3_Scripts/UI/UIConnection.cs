@@ -124,20 +124,20 @@ public class UIConnection : MonoBehaviour
     #region Networking
     private void OnClickStartServerButton()
     {
-        MultiplayerNetworkManager.singleton.StartServer();
+        NetworkManager.singleton.StartServer();
     }
     private void OnClickStartHostButton()
     {
-        MultiplayerNetworkManager.singleton.StartHost();
+        NetworkManager.singleton.StartHost();
     }
     private void OnClickStartClientButton()
     {
-        MultiplayerNetworkManager.singleton.StartClient();
+        NetworkManager.singleton.StartClient();
     }
 
     private void OnNetworkAddressChange()
     {
-        MultiplayerNetworkManager.singleton.networkAddress = inputIP.text;
+        NetworkManager.singleton.networkAddress = inputIP.text;
     }
 
     private void OnPortChange()

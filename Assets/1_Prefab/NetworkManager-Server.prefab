@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 4683264729435307690}
   - component: {fileID: 2896100284453661427}
   m_Layer: 0
-  m_Name: NetworkManager
+  m_Name: NetworkManager-Server
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5792886669837433241
 Transform:
   m_ObjectHideFlags: 0
@@ -54,7 +54,7 @@ MonoBehaviour:
   onlineScene: 
   offlineSceneLoadDelay: 0
   transport: {fileID: 2896100284453661427}
-  networkAddress: localhost
+  networkAddress: 54.255.201.165
   maxConnections: 100
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
@@ -62,7 +62,8 @@ MonoBehaviour:
   playerPrefab: {fileID: 4954549869161687567, guid: 6709bd3dae07f0548987e2eb1462524b, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 1
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 2770910788967278029, guid: 74e41e98418b9d046a1fda599b3a59f9, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -79,7 +80,6 @@ MonoBehaviour:
   evaluationInterval: 3
   timeInterpolationGui: 0
   playerFab: {fileID: 2770910788967278029, guid: 74e41e98418b9d046a1fda599b3a59f9, type: 3}
-  camBrain: {fileID: 8683469898437007431, guid: 3cbc7801f368cce4a881ea611ee14be1, type: 3}
 --- !u!114 &2896100284453661427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  port: 7777
+  port: 7792
   DualMode: 1
   NoDelay: 1
   Interval: 10

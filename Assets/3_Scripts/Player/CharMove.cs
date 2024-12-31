@@ -16,9 +16,16 @@ public class CharMove : MonoBehaviour
 	private Vector3 velocity = Vector3.zero;
 
 	private Rigidbody rb;
-	private Animator anim;
-	private NetworkAnimator nAnim;
 	private ThirdPersonOrbitCamBasic cam_TPS;
+
+	//action callbacks
+	public event Action OnWalk;
+	public event Action OnSprint;
+	public event Action OnIdle;
+	public event Action<bool> OnFalling;
+	public event Action<bool> OnLanding;
+	public event Action OnJumpStart;
+	public event Action OnJumpLand;
 
 	//grounded variables so anim will be in sync
 	private bool isGrounded;
@@ -29,7 +36,6 @@ public class CharMove : MonoBehaviour
 	//jump variables
 	public float JumpHeight = 2.4f;
 
-	private bool isUsingFPSCam;
 	private bool isCursorLocked; //for initializing lock purposes
 
 	private float currYSpeed;
@@ -37,15 +43,12 @@ public class CharMove : MonoBehaviour
 
 	private void Awake()
     {
-		isUsingFPSCam = false;
 		isCursorLocked = false;
 	}
 
 	void Start()
 	{
 		rb = GetComponent<Rigidbody>();
-		anim = GetComponent<Animator>();
-		nAnim = GetComponent<NetworkAnimator>();
 		cam_TPS = thirdPersonCam.GetComponent<ThirdPersonOrbitCamBasic>();
 
 		if (Cursor.lockState != CursorLockMode.Locked)
@@ -74,10 +77,9 @@ public class CharMove : MonoBehaviour
 
 		isSprinting = Input.GetButton("Fire3");
 
-		if (!isUsingFPSCam)
-		{
-			Rotating(x, y);
-		}
+
+		Rotating(x, y);
+		
 
 		Vector3 direction = GetDir(x, y);
 		Vector3 movement = direction * walkSpeed * (isSprinting ? sprintFactor : 1);
@@ -85,7 +87,6 @@ public class CharMove : MonoBehaviour
 		HandleSprinting();
 		HandleJump();
 		Move(movement);
-		anim.SetFloat("MotionSpeed", movement.magnitude/4);
 		AnimatePlayer();
 	}
 
@@ -127,6 +128,13 @@ public class CharMove : MonoBehaviour
 				// Apply jump force to Rigidbody
 				rb.linearVelocity = new Vector3(rb.linearVelocity.x, Mathf.Sqrt(JumpHeight * -2f * Physics.gravity.y), rb.linearVelocity.z);
 				isJumping = true;
+				OnJumpStart?.Invoke();
+			}
+
+			if (isJumping)
+			{
+				OnJumpLand?.Invoke();
+				isJumping = false;
 			}
 		}
 	}
@@ -164,40 +172,23 @@ public class CharMove : MonoBehaviour
 		{
 			if (isSprinting)
 			{
-				anim.SetFloat("Speed", 2f);
+				//Debug.Log($"sprint invoked");
+				OnSprint?.Invoke();
 			}
 			else
 			{
-				anim.SetFloat("Speed", 1f);
+				//Debug.Log($"walk invoked");
+				OnWalk?.Invoke();
 			}
 		}
 		else
 		{
-			anim.SetFloat("Speed", 0f);
+			//Debug.Log($"idle invoked");
+			OnIdle?.Invoke();
 		}
 
-		anim.SetBool("Grounded", isGrounded);
-		anim.SetBool("FreeFall", !isGrounded);
-
-		if (currYSpeed > 0 && isGrounded) // Starting a jump
-		{
-			anim.SetTrigger("Jump_Start");
-			nAnim.SetTrigger("Jump_Start");
-		}
-		else if (!isGrounded) // In free fall (falling down)
-		{
-			anim.ResetTrigger("Jump_Start"); // Ensure no conflicting triggers
-			nAnim.ResetTrigger("Jump_Start");
-		}
-		if (isGrounded && isJumping) // Landed after a jump or fall
-		{
-			isJumping = false;
-			anim.SetTrigger("Jump_Land");
-			nAnim.SetTrigger("Jump_Land");
-			anim.ResetTrigger("Jump_Start"); // Ensure no conflicting triggers
-			nAnim.ResetTrigger("Jump_Start"); // Ensure no conflicting triggers
-		}
-
+		OnFalling?.Invoke(!isGrounded);
+		OnLanding?.Invoke(isGrounded);
 	}
 
 	public void LockCursor(bool locking)
