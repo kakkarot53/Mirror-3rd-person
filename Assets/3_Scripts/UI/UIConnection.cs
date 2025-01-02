@@ -81,7 +81,7 @@ public class UIConnection : MonoBehaviour
             Destroy(modelSpawnPos.GetChild(0).gameObject);
         }
         Instantiate(
-            currModelData.playerPrefab,
+            currModelData.playerModel,
             modelSpawnPos.position, 
             Quaternion.Euler(0, 180, 0),
             modelSpawnPos);

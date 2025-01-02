@@ -34,7 +34,8 @@ public class PlayerSetup : NetworkBehaviour
         if (LocalPlayerNick.Instance != null)
         {
             _model.SetAvatar(LocalPlayerNick.Instance.playerModelPrefab.playerAvatar);
-            _model.CmdChangeModel(LocalPlayerNick.Instance.playerModelPrefab.playerPrefab.name);
+            _model.CmdChangeModel(LocalPlayerNick.Instance.playerModelPrefab.playerBaseModel.name, 
+                LocalPlayerNick.Instance.playerModelPrefab.playerModel.name);
         }
 
         //setup name disp

@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79e0b4864b49a434692436a0bd7832e2, type: 3}
   m_Name: Model 3
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 1832574453826720, guid: 788b00144675db14ab99aaf2c6e9b1d8, type: 3}
+  playerBaseModel: {fileID: 6247533280868124745, guid: b383f7e69d6227d44bc0d5176941896f, type: 3}
+  playerModel: {fileID: 1848146552881938, guid: 1ae9f18a08e64d54b990d8ad6d9b3e53, type: 3}
   playerAvatar: {fileID: 9000000, guid: e274402e4c839934c817fc0664347c81, type: 3}
