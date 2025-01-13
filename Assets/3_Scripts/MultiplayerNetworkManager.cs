@@ -9,12 +9,16 @@ public class MultiplayerNetworkManager : NetworkManager
     {
         base.OnServerAddPlayer(conn);
 
-        GameObject _unitSpwn = Instantiate(playerFab, conn.identity.transform.position, conn.identity.transform.rotation);
-        NetworkServer.Spawn(_unitSpwn, conn);
+        //GameObject _unitSpwn = Instantiate(playerFab, conn.identity.transform.position, conn.identity.transform.rotation);
+        //NetworkServer.Spawn(_unitSpwn, conn);
+        //Debug.Log($"player Id: {conn.connectionId}'s {_unitSpwn.name} has been spawned usccessfully");
 
-        Debug.Log($"player Id: {conn.connectionId}'s {_unitSpwn.name} has been spawned usccessfully");
+        //Transform _bmPar = _unitSpwn.transform.GetChild(0);
+        //Debug.Log($"model parent name: {_bmPar.name}");
 
-        GameObject _mng = conn.identity.gameObject;
+        //GameObject _bm = Instantiate(LocalPlayerNick.Instance.playerModelPrefab.playerBaseModel, _unitSpwn.transform.position, Quaternion.identity, _bmPar);
+        //NetworkServer.Spawn(_bm, _unitSpwn);
+        //Debug.Log($"base model: {_bm} has been spawned");
     }
     public override void OnClientConnect()
     {

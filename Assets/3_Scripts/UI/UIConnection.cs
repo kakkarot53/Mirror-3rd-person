@@ -14,7 +14,7 @@ public class UIConnection : MonoBehaviour
     [Header("Char Select Panel")]
     [SerializeField] private GameObject charSelectPanel;
     [SerializeField] private int currPlayModelIndex;
-    [SerializeField] private PlayerModelData[] playModelData;
+    [SerializeField] private GameObject[] playerModels;
     [SerializeField] private Transform modelSpawnPos;
     [SerializeField] private Button nextBtn;
     [SerializeField] private Button prevBtn;
@@ -29,17 +29,31 @@ public class UIConnection : MonoBehaviour
     [SerializeField] private Button btnHost;
     [SerializeField] private Button btnClient;
 
-    private PlayerModelData currModelData;
+    //for changing models
+    private int[] playerModelLength;
+    private int totalModelCount;
+
+    private int currPlayerBaseModelId;
+    private int currPlayerModelId;
+
     private void Start()
     {
         ActivatePanel(nameInpPanel.name);
-        ChangeIndex(0);
         // Init the input field with Network Manager's network address.
         inputIP.text = NetworkManager.singleton.networkAddress;
         GetPort();
 
         RegisterListeners();
 
+        playerModelLength = new int[playerModels.Length];
+        // Set up the model lengths
+        for (int i = 0; i < playerModels.Length; i++)
+        {
+            playerModelLength[i] = playerModels[i].transform.GetChild(0).childCount;
+            totalModelCount += playerModels[i].transform.GetChild(0).childCount;
+        }
+
+        ChangeIndex(0);
         //RegisterClientEvents();
     }
     #region Name Input Panel Functions
@@ -64,27 +78,50 @@ public class UIConnection : MonoBehaviour
         //Debug.Log($"ChangeIndex is called. param value = {i}");
         currPlayModelIndex += i;
 
-        if (currPlayModelIndex >= playModelData.Length)
+        if (currPlayModelIndex >= totalModelCount)
             currPlayModelIndex = 0;
 
         if (currPlayModelIndex < 0)
-            currPlayModelIndex = playModelData.Length - 1;
+            currPlayModelIndex = totalModelCount-1;
+
+        CalcModelID(currPlayModelIndex);
         ChangeModel();
+    }
+
+    private void CalcModelID(int globalIndex)
+    {
+        int count = 0;
+
+        for (int i = 0; i < playerModelLength.Length; i++)
+        {
+            count += playerModelLength[i];
+
+            if (globalIndex < count)
+            {
+                currPlayerBaseModelId = i;
+                currPlayerModelId = globalIndex - (count - playerModelLength[i]);
+                return;
+            }
+        }
     }
 
     private void ChangeModel()
     {
         //Debug.Log($"ChangeModel is called");
-        currModelData = playModelData[currPlayModelIndex];
+
         if (modelSpawnPos.childCount > 0)
         {
             Destroy(modelSpawnPos.GetChild(0).gameObject);
         }
-        Instantiate(
-            currModelData.playerModel,
-            modelSpawnPos.position, 
+
+        GameObject model = Instantiate(
+            playerModels[currPlayerBaseModelId],
+            modelSpawnPos.position,
             Quaternion.Euler(0, 180, 0),
             modelSpawnPos);
+        GameObject playerModel = model.transform.GetChild(0).GetChild(currPlayerModelId).gameObject;
+        playerModel.SetActive(true);
+        //Debug.Log($"{currPlayerBaseModelId}: child {currPlayerModelId} has been activated");
     }
 
     #endregion
@@ -99,7 +136,8 @@ public class UIConnection : MonoBehaviour
         prevBtn.onClick.AddListener(()=>ChangeIndex(-1));
         selectBtn.onClick.AddListener(() => 
         {
-            LocalPlayerNick.Instance.SetModel(currModelData);
+            LocalPlayerNick.Instance.SetModelId(currPlayerModelId);
+            LocalPlayerNick.Instance.SetBaseModelId(currPlayerBaseModelId);
             ActivatePanel(joinRoomPanel.name);
         });
 

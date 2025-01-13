@@ -3,31 +3,56 @@ using Mirror;
 using TMPro;
 public class NamePlate : NetworkBehaviour
 {
-    private Camera _cam;
+    private Transform _cam;
+
     [SerializeField]
     private TMP_Text nameTxt;
-    [SyncVar(hook = nameof(ChangeName))] //=> calls this
+
+    [SyncVar(hook = nameof(OnNameDisplay))] //=> calls this
     private string playerNickName;
-    void Start()
+    
+    private PlayerMultSetup setup;
+
+    private void Start()
     {
-        //if (transform.root.GetComponent<NetworkIdentity>().isOwned == true)
-        //    gameObject.SetActive(false);
+        if (Camera.main != null)
+        {
+            _cam = Camera.main.transform;
+        }
     }
 
-    // Update is called once per frame
+    public override void OnStartClient()
+    {
+        if (!isOwned)
+            return;
+
+        setup = NetworkClient.localPlayer.GetComponent<PlayerMultSetup>();
+        //_cam = setup.cameraTransform;
+
+        UpdateDisplayName();
+    }
+
+    public void UpdateDisplayName()
+    {
+        if (setup == null || nameTxt == null)
+            return;
+
+        CmdSetName(LocalPlayerNick.Instance.nickName);
+    }
+
     void Update()
     {
-        if (_cam == null)
-            _cam = Camera.main;
+        if (_cam != null)
         transform.LookAt(_cam.transform);
     }
+
     [Command]
     public void CmdSetName(string name)
     {
         playerNickName = name;
     }
 
-    private void ChangeName(string oldDisplayName, string newDisplayName)
+    private void OnNameDisplay(string oldDisplayName, string newDisplayName)
     {
         playerNickName = newDisplayName;
         nameTxt.text = playerNickName;
@@ -35,6 +60,6 @@ public class NamePlate : NetworkBehaviour
 
     public void SetCam(Camera cam)
     {
-        _cam = cam;
+        _cam = cam.transform;
     }
 }

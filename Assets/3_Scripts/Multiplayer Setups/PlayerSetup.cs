@@ -8,7 +8,6 @@ public class PlayerSetup : NetworkBehaviour
 
     [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
     private string displayName;
-    [SyncVar] private GameObject playerModelPrefab;
 
     public static event Action ClientOnInfoUpdated;
 
@@ -29,15 +28,6 @@ public class PlayerSetup : NetworkBehaviour
             }
         }
 
-        //setup model
-        PlayerModel _model = localPlayerModel.GetComponent<PlayerModel>();
-        if (LocalPlayerNick.Instance != null)
-        {
-            _model.SetAvatar(LocalPlayerNick.Instance.playerModelPrefab.playerAvatar);
-            _model.CmdChangeModel(LocalPlayerNick.Instance.playerModelPrefab.playerBaseModel.name, 
-                LocalPlayerNick.Instance.playerModelPrefab.playerModel.name);
-        }
-
         //setup name disp
         localPlayerModel.GetChild(1).TryGetComponent<NamePlate>(out NamePlate _plate);
         if (LocalPlayerNick.Instance != null)
@@ -50,19 +40,21 @@ public class PlayerSetup : NetworkBehaviour
         _move.enabled = true;
         _move.thirdPersonCam = cameraTransform.gameObject;
 
+        //setup model
+        PlayerModel _model = localPlayerModel.GetComponent<PlayerModel>();
+        if (LocalPlayerNick.Instance != null)
+        {
+            Transform modelPar = localPlayerModel.GetChild(0);
+
+            GameObject _bm = modelPar.GetChild(0).gameObject;
+
+            _model.SetBaseModel(_bm);
+            //_model.SetAvatar(LocalPlayerNick.Instance.playerModelPrefab.playerAvatar);
+            //_model.CmdChangeModel(LocalPlayerNick.Instance.playerModelPrefab.playerModel.name);
+        }
 
     }
 
-    #region Get Variables
-    public string GetDisplayName()
-    {
-        return displayName;
-    }
-    public Transform GetCameraTransform()
-    {
-        return cameraTransform;
-    }
-    #endregion
 
     [Command]
     public void SetDisplayName(string displayName)

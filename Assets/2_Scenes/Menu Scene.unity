@@ -893,11 +893,9 @@ MonoBehaviour:
   nameConfirmBtn: {fileID: 409548197}
   charSelectPanel: {fileID: 1251296985}
   currPlayModelIndex: 0
-  playModelData:
-  - {fileID: 11400000, guid: 0484787410a89794088c505709692641, type: 2}
-  - {fileID: 11400000, guid: 57ac79c90791acd41b6f8058a3dbda3c, type: 2}
-  - {fileID: 11400000, guid: 98300e78f3c770e4c802348821f9c1c2, type: 2}
-  - {fileID: 11400000, guid: 29165f2f3fe08bc44b44d8dec2b8ad37, type: 2}
+  playerModels:
+  - {fileID: 6247533280868124745, guid: b383f7e69d6227d44bc0d5176941896f, type: 3}
+  - {fileID: 5261521762340787377, guid: 420ceb1feb26fad4e9a4ca8eac24f0e4, type: 3}
   modelSpawnPos: {fileID: 1185571357}
   nextBtn: {fileID: 1682129084}
   prevBtn: {fileID: 972458026}
@@ -3012,7 +3010,7 @@ GameObject:
   - component: {fileID: 1092744578}
   - component: {fileID: 1092744577}
   m_Layer: 0
-  m_Name: LocalPlayerName
+  m_Name: _LocalPlayerName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3101,6 +3099,18 @@ PrefabInstance:
       propertyPath: onlineScene
       value: Assets/2_Scenes/Game Scene.unity
       objectReference: {fileID: 0}
+    - target: {fileID: 7471062485768684060, guid: 5f75f6ac794f51c48a7d3c736bcefc95, type: 3}
+      propertyPath: spawnPrefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7471062485768684060, guid: 5f75f6ac794f51c48a7d3c736bcefc95, type: 3}
+      propertyPath: 'spawnPrefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 6247533280868124745, guid: b383f7e69d6227d44bc0d5176941896f, type: 3}
+    - target: {fileID: 7471062485768684060, guid: 5f75f6ac794f51c48a7d3c736bcefc95, type: 3}
+      propertyPath: 'spawnPrefabs.Array.data[2]'
+      value: 
+      objectReference: {fileID: 5261521762340787377, guid: 420ceb1feb26fad4e9a4ca8eac24f0e4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4943,7 +4953,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2131166062}
   m_Layer: 0
-  m_Name: Player Selecy GameObject
+  m_Name: Player Select GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4970,11 +4980,11 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1092744578}
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 159232873}
   - {fileID: 1373322011}
-  - {fileID: 1092744578}
   - {fileID: 2131166062}
   - {fileID: 1130894297}

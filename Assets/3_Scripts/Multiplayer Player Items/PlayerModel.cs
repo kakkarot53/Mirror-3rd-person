@@ -7,8 +7,6 @@ public class PlayerModel : NetworkBehaviour
 
     [SyncVar(hook = nameof(OnModelUpdated))]
     private string currentModelName;    
-    [SyncVar(hook = nameof(OnBaseModelUpdated))]
-    private string currentBaseModelName;
 
     private Animator anim;
     private NetworkAnimator networkAnim;
@@ -24,34 +22,15 @@ public class PlayerModel : NetworkBehaviour
     {
         anim.avatar = avatar;
     }
-
-    [Command]
-    public void CmdChangeModel(string baseModelName, string modelName)
+    public void SetBaseModel(GameObject baseModel)
     {
-        currentBaseModelName = baseModelName;
-        currentModelName = modelName;
+        baseModelGO = baseModel.transform;
     }
 
-    private void OnBaseModelUpdated(string oldModelName, string newModelName)
+    [Command]
+    public void CmdChangeModel(string modelName)
     {
-        currentBaseModelName = newModelName;
-
-        foreach (Transform child in modelParent)
-        {
-            child.gameObject.SetActive(false);
-        }
-
-        baseModelGO = modelParent.Find(currentBaseModelName);
-        if (baseModelGO != null)
-        {
-            baseModelGO.gameObject.SetActive(true);
-            anim.Rebind();
-            networkAnim.animator = anim;
-        }
-        else
-        {
-            Debug.LogWarning($"Model with name {baseModelGO} not found under modelParent.");
-        }
+        currentModelName = modelName;
     }
 
     private void OnModelUpdated(string oldModelName, string newModelName)

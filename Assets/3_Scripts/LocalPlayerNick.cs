@@ -6,7 +6,8 @@ public class LocalPlayerNick : MonoBehaviour
     public static LocalPlayerNick Instance;
 
     public string nickName { private set; get; }
-    public PlayerModelData playerModelPrefab { private set; get; }
+    public int playerModelId { private set; get; }
+    public int playerBaseModelId { private set; get; }
 
     private void Awake()
     {
@@ -27,8 +28,12 @@ public class LocalPlayerNick : MonoBehaviour
     {
         nickName = name;
     }    
-    public void SetModel(PlayerModelData data)
+    public void SetModelId(int id)
     {
-        playerModelPrefab = data;
+        playerModelId = id;
+    }
+    public void SetBaseModelId(int id)
+    {
+        playerBaseModelId = id;
     }
 }
